@@ -131,6 +131,15 @@
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
+        /* Estilo para el marcador de semana */
+        .semana-badge {
+            background: #e2e8f0;
+            font-weight: bold;
+            color: var(--night-blue);
+            text-align: center;
+            cursor: default;
+        }
+
         .checkbox-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -197,28 +206,33 @@
         <div class="grid-2">
             <div class="form-group">
                 <label>Fecha *</label>
-                <input type="date" name="fecha" id="fechaActual" required>
+                <input type="date" name="fecha" id="fechaActual" onchange="actualizarNumeroSemana()" required>
             </div>
             <div class="form-group">
-                <label>Lugar de Observación *</label>
-                <select name="sitio" id="sitioSelect" onchange="toggleOtroLugar()" required>
-                    <option value="">Seleccione lugar...</option>
-                    <option value="Almacén">Almacén</option>
-                    <option value="Biología">Biología</option>
-                    <option value="Calidad">Calidad</option>
-                    <option value="Campo">Campo</option>
-                    <option value="Embarques">Embarques</option>
-                     <option value="Lavadoras">Lavadoras</option>
-                    <option value="Molinos">Molinos</option>
-                    <option value="Oficinas">Oficinas</option>
-                    <option value="Registro (Vigilancia)">Registro (Vigilancia)</option>
-                    <option value="Mantto. Industrial">Mantto. Industrial</option>
-                    <option value="Mantto. Automotriz">Mantto. Automotriz</option>
-                     <option value="Transporte">Transporte</option>
-                    <option value="Otro">Otro</option>
-                </select>
-                <input type="text" name="otroSitio" id="otroSitio" class="hidden mt-2" placeholder="Especifique el lugar">
+                <label>Semana del Año</label>
+                <input type="text" id="numSemana" name="semana" class="semana-badge" readonly placeholder="Calculando...">
             </div>
+        </div>
+
+        <div class="form-group">
+            <label>Lugar de Observación *</label>
+            <select name="sitio" id="sitioSelect" onchange="toggleOtroLugar()" required>
+                <option value="">Seleccione lugar...</option>
+                <option value="Almacén">Almacén</option>
+                <option value="Biología">Biología</option>
+                <option value="Calidad">Calidad</option>
+                <option value="Campo">Campo</option>
+                <option value="Embarques">Embarques</option>
+                 <option value="Lavadoras">Lavadoras</option>
+                <option value="Molinos">Molinos</option>
+                <option value="Oficinas">Oficinas</option>
+                <option value="Registro (Vigilancia)">Registro (Vigilancia)</option>
+                <option value="Mantto. Industrial">Mantto. Industrial</option>
+                <option value="Mantto. Automotriz">Mantto. Automotriz</option>
+                 <option value="Transporte">Transporte</option>
+                <option value="Otro">Otro</option>
+            </select>
+            <input type="text" name="otroSitio" id="otroSitio" class="hidden mt-2" placeholder="Especifique el lugar">
         </div>
 
         <div class="form-group">
@@ -340,7 +354,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzEn-UNJYMbR-xmn5KcQK0PlmhVpHYmGVHnXdRiPG3BrcI1Z42bQZSACQejIjLdggYx/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwkbAQRPRjxCJdkQsXdt9lUG3lpMpH1VskR040YioD_J91N2y6RbsPTwADarjnnA7Wz/exec";
     const LOGO_BASE64 = "data:image/png;base64,TU_LOGO_EN_BASE64_AQUÍ";
 
     // Diccionario de correos electrónicos
@@ -362,8 +376,26 @@
 
     window.onload = () => {
         document.getElementById('fechaActual').valueAsDate = new Date();
+        actualizarNumeroSemana(); // Calcular semana al cargar
         cargarListas();
     };
+
+    // FUNCIÓN PARA CALCULAR EL NÚMERO DE SEMANA
+    function actualizarNumeroSemana() {
+        const fechaInput = document.getElementById('fechaActual').value;
+        if (!fechaInput) return;
+        
+        const date = new Date(fechaInput);
+        date.setHours(0, 0, 0, 0);
+        // Jueves de la semana actual define el año de la semana
+        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+        // El 4 de enero es siempre la semana 1
+        const week1 = new Date(date.getFullYear(), 0, 4);
+        // Calcular diferencia en días y dividir por 7
+        const numSemana = 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        
+        document.getElementById('numSemana').value = "Semana " + numSemana;
+    }
 
     async function cargarListas() {
         try {
@@ -528,6 +560,7 @@
             head: [['Campo', 'Información']],
             body: [
                 ['Fecha de Reporte', datos.fecha],
+                ['Semana', datos.semana], // Se añade la semana al PDF también
                 ['Sitio / Lugar', datos.sitio],
                 ['Nombre del Observador', datos.observador],
                 ['Descripción del Riesgo', datos.descripcionCondicion],
