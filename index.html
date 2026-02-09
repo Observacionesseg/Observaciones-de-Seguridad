@@ -131,7 +131,6 @@
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
         }
 
-        /* Estilo para el marcador de semana */
         .semana-badge {
             background: #e2e8f0;
             font-weight: bold;
@@ -223,13 +222,13 @@
                 <option value="Calidad">Calidad</option>
                 <option value="Campo">Campo</option>
                 <option value="Embarques">Embarques</option>
-                 <option value="Lavadoras">Lavadoras</option>
+                <option value="Lavadoras">Lavadoras</option>
                 <option value="Molinos">Molinos</option>
                 <option value="Oficinas">Oficinas</option>
                 <option value="Registro (Vigilancia)">Registro (Vigilancia)</option>
                 <option value="Mantto. Industrial">Mantto. Industrial</option>
                 <option value="Mantto. Automotriz">Mantto. Automotriz</option>
-                 <option value="Transporte">Transporte</option>
+                <option value="Transporte">Transporte</option>
                 <option value="Otro">Otro</option>
             </select>
             <input type="text" name="otroSitio" id="otroSitio" class="hidden mt-2" placeholder="Especifique el lugar">
@@ -247,6 +246,7 @@
                 <option value="">-- Seleccione una opción --</option>
                 <option value="acto">Observación de Seguridad</option>
                 <option value="condicion">Condición Insegura</option>
+                <option value="altoRiesgo">Trabajo de alto riesgo</option>
             </select>
         </div>
 
@@ -354,10 +354,9 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwkbAQRPRjxCJdkQsXdt9lUG3lpMpH1VskR040YioD_J91N2y6RbsPTwADarjnnA7Wz/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxldLIlq-w2hUaouOIy_mTAlni4xNa88N3gMw9eQFEPByohqAZj1rp0uGSU8Qn-ZoDr/exec";
     const LOGO_BASE64 = "data:image/png;base64,TU_LOGO_EN_BASE64_AQUÍ";
 
-    // Diccionario de correos electrónicos
     const emailsResponsables = {
         "Biol. Leonel De Jesus Perera Ak": "lperera@isysa.com.mx",
         "Lic. Rafael Jesus Perez Avila": "rperez@isysa.com.mx",
@@ -375,24 +374,28 @@
     };
 
     window.onload = () => {
-        document.getElementById('fechaActual').valueAsDate = new Date();
-        actualizarNumeroSemana(); // Calcular semana al cargar
+        // Establecer fecha de hoy en formato local
+        const hoy = new Date();
+        const offset = hoy.getTimezoneOffset() * 60000;
+        const localISODate = (new Date(hoy - offset)).toISOString().split('T')[0];
+        document.getElementById('fechaActual').value = localISODate;
+        
+        actualizarNumeroSemana(); 
         cargarListas();
     };
 
-    // FUNCIÓN PARA CALCULAR EL NÚMERO DE SEMANA
     function actualizarNumeroSemana() {
         const fechaInput = document.getElementById('fechaActual').value;
         if (!fechaInput) return;
         
-        const date = new Date(fechaInput);
-        date.setHours(0, 0, 0, 0);
-        // Jueves de la semana actual define el año de la semana
-        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-        // El 4 de enero es siempre la semana 1
-        const week1 = new Date(date.getFullYear(), 0, 4);
-        // Calcular diferencia en días y dividir por 7
-        const numSemana = 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        // Usar ISO-8601 (Lunes inicio de semana)
+        const date = new Date(fechaInput + "T00:00:00"); 
+        const target = new Date(date.valueOf());
+        const dayNr = (date.getDay() + 6) % 7;
+        target.setDate(target.getDate() + 4 - dayNr);
+        const jan4 = new Date(target.getFullYear(), 0, 4);
+        const dayDiff = (target - jan4) / 86400000;
+        const numSemana = 1 + Math.ceil(dayDiff / 7);
         
         document.getElementById('numSemana').value = "Semana " + numSemana;
     }
@@ -432,6 +435,14 @@
 
     function toggleSections() {
         const tipo = document.getElementById('tipoObservacion').value;
+        
+        // Nueva lógica para Trabajo de Alto Riesgo
+        if (tipo === 'altoRiesgo') {
+            const urlOtroCuestionario = ""; // REEMPLAZA ESTO
+            window.location.href = urlOtroCuestionario;
+            return;
+        }
+
         const seccionActo = document.getElementById('seccionActo');
         const seccionCondicion = document.getElementById('seccionCondicion');
         
@@ -485,7 +496,9 @@
         const formData = new FormData(this);
         const payload = {};
         formData.forEach((v, k) => { 
-            if (k === 'sitio' && v === 'Otro') {
+            if (k === 'semana') {
+                payload[k] = v.replace("Semana ", "");
+            } else if (k === 'sitio' && v === 'Otro') {
                 payload[k] = formData.get('otroSitio');
             } else if (k === 'razonInsegura' && v === 'Otro') {
                 payload[k] = formData.get('otroRazonInsegura');
@@ -495,9 +508,7 @@
         });
 
         const faltantesArr = Array.from(document.querySelectorAll('input[name="falta"]:checked')).map(cb => {
-            if(cb.value === 'Otro') {
-                return "Otro: " + document.getElementById('otroFaltante').value;
-            }
+            if(cb.value === 'Otro') return "Otro: " + document.getElementById('otroFaltante').value;
             return cb.value;
         });
         payload.falta = faltantesArr.join(", ");
@@ -505,7 +516,6 @@
         const seleccionados = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value.trim());
         payload.responsables = seleccionados.join(", ");
         
-        // Obtener correos electrónicos correspondientes
         const listaEmails = seleccionados.map(nombre => emailsResponsables[nombre] || "").filter(email => email !== "");
         payload.emailsResponsables = listaEmails.join(",");
 
@@ -524,7 +534,6 @@
         try {
             if (payload.tipoObservacion === 'condicion') {
                 await generarPDF(payload);
-                alert("Generando PDF y enviando notificaciones a responsables...");
             }
 
             await fetch(scriptURL, { method: "POST", body: params, mode: 'no-cors' });
@@ -541,44 +550,85 @@
     async function generarPDF(datos) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = doc.internal.pageSize.getWidth();
         
-        try {
-            doc.addImage(LOGO_BASE64, 'PNG', 15, 10, 30, 20);
-        } catch (e) {
-            console.warn("No se pudo cargar el logo en el PDF.");
-        }
+        // --- 1. ENCABEZADO EJECUTIVO (TIPO TABLA) ---
+        // Logo
+        try { 
+            doc.addImage(LOGO_BASE64, 'PNG', 15, 12, 25, 15); 
+        } catch (e) { console.warn("Logo no disponible"); }
 
+        // Título Central
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.setTextColor(0, 35, 68); 
-        doc.text("Reporte de Condición Insegura", 50, 20);
-        doc.setFontSize(10);
-        doc.text("Industria Salinera de Yucatán S.A de C.V.", 50, 26);
+        doc.setFontSize(14);
+        doc.setTextColor(0, 35, 68);
+        doc.text("INDUSTRIA SALINERA DE YUCATÁN S.A. DE C.V.", 45, 18);
         
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text("SISTEMA DE GESTIÓN DE SEGURIDAD Y SALUD OCUPACIONAL", 45, 23);
+        
+        doc.setDrawColor(0, 35, 68);
+        doc.setLineWidth(0.5);
+        doc.line(15, 30, pageWidth - 15, 30); // Línea divisoria
+
+        // --- 2. INFORMACIÓN GENERAL (TABLA AUDITABLE) ---
         doc.autoTable({
-            startY: 40,
-            head: [['Campo', 'Información']],
+            startY: 35,
+            head: [[{ content: 'CÉDULA DE REPORTE: CONDICIÓN INSEGURA', colSpan: 2, styles: { halign: 'center' } }]],
             body: [
-                ['Fecha de Reporte', datos.fecha],
-                ['Semana', datos.semana], // Se añade la semana al PDF también
-                ['Sitio / Lugar', datos.sitio],
-                ['Nombre del Observador', datos.observador],
-                ['Descripción del Riesgo', datos.descripcionCondicion],
-                ['Responsables Asignados', datos.responsables]
+                ['FECHA DE REGISTRO:', datos.fecha],
+                ['SEMANA CORRESPONDIENTE:', datos.semana],
+                ['LUGAR / ÁREA ESPECÍFICA:', datos.sitio.toUpperCase()],
+                ['REPORTADO POR:', datos.observador.toUpperCase()],
+                ['RESPONSABLE(S) ASIGNADO(S):', datos.responsables]
             ],
-            headStyles: { fillColor: [0, 35, 68] }, 
-            theme: 'grid'
+            theme: 'grid',
+            headStyles: { fillColor: [0, 35, 68], textColor: [255, 255, 255], fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 3 },
+            columnStyles: { 0: { cellWidth: 50, fontStyle: 'bold', fillColor: [240, 240, 240] } }
         });
 
-        if (datos.fotografia) {
-            doc.addPage();
-            doc.setFontSize(12);
-            doc.text("EVIDENCIA FOTOGRÁFICA", 15, 20);
-            doc.addImage(datos.fotografia, 'JPEG', 15, 30, 180, 135);
-        }
+        // --- 3. DESCRIPCIÓN DEL HALLAZGO ---
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("DESCRIPCIÓN TÉCNICA DEL HALLAZGO:", 15, finalY);
         
-        doc.save(`Reporte_ISYSA_${datos.fecha}.pdf`);
+        doc.setFont("helvetica", "normal");
+        const splitDesc = doc.splitTextToSize(datos.descripcionCondicion, pageWidth - 30);
+        doc.text(splitDesc, 15, finalY + 7);
+
+        // --- 4. EVIDENCIA FOTOGRÁFICA ---
+        if (datos.fotografia) {
+            const imgY = finalY + 25;
+            doc.setFont("helvetica", "bold");
+            doc.text("EVIDENCIA FOTOGRÁFICA:", 15, imgY - 3);
+            
+            // Recuadro para la foto
+            doc.setDrawColor(200);
+            doc.rect(15, imgY, 180, 110); 
+            doc.addImage(datos.fotografia, 'JPEG', 18, imgY + 3, 174, 104);
+        }
+
+        // --- 5. PIE DE PÁGINA / FIRMAS (AUDITABLE) ---
+        const bottomY = 270;
+        doc.setLineWidth(0.2);
+        doc.line(20, bottomY, 80, bottomY);
+        doc.line(130, bottomY, 190, bottomY);
+        
+        doc.setFontSize(8);
+        doc.text("FIRMA DEL OBSERVADOR", 32, bottomY + 5);
+        doc.text("FIRMA DE RECIBIDO (SIPA)", 142, bottomY + 5);
+        
+        doc.setTextColor(150);
+        doc.text(`Documento generado electrónicamente - ID: ${Date.now()}`, 15, 285);
+        doc.text(`Página 1 de 1`, pageWidth - 30, 285);
+
+        // Guardar
+        doc.save(`REPORTE_SEGURIDAD_ISYSA_${datos.fecha}_S${datos.semana}.pdf`);
     }
 </script>
 </body>
 </html>
+
