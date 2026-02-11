@@ -198,6 +198,15 @@
 
     <form id="seguridadForm">
         <div class="form-group">
+            <label>Tipo de Observación *</label>
+            <select id="tipoObservacion" name="tipoObservacion" onchange="toggleSections()" required>
+                <option value="">-- Seleccione una opción --</option>
+                <option value="acto">Observación de Seguridad</option>
+                <option value="condicion">Condición Insegura</option>
+                <option value="altoRiesgo">Trabajo de alto riesgo</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label>Correo Electrónico *</label>
             <input type="email" name="correo" placeholder="ejemplo@isysa.com" required>
         </div>
@@ -238,16 +247,6 @@
             <label>Observador *</label>
             <input type="text" list="listaObservadores" name="observador" placeholder="Nombre de quien observa" required>
             <datalist id="listaObservadores"></datalist>
-        </div>
-
-        <div class="form-group">
-            <label>Tipo de Observación *</label>
-            <select id="tipoObservacion" name="tipoObservacion" onchange="toggleSections()" required>
-                <option value="">-- Seleccione una opción --</option>
-                <option value="acto">Observación de Seguridad</option>
-                <option value="condicion">Condición Insegura</option>
-                <option value="altoRiesgo">Trabajo de alto riesgo</option>
-            </select>
         </div>
 
         <div id="seccionActo" class="section hidden">
@@ -630,4 +629,5 @@
 </script>
 </body>
 </html>
+
 
