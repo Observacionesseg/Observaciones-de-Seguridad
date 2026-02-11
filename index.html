@@ -322,8 +322,8 @@
         <div id="seccionCondicion" class="section hidden">
             <h3>II. CONDICIÓN INSEGURA</h3>
             <div class="form-group">
-                <label>Descripción del riesgo detectado (especificar lugar) *</label>
-                <textarea id="condicionDesc" name="descripcionCondicion" rows="3" placeholder="Detalle la falla o riesgo..."></textarea>
+                <label>Descripción de la condición insegura (especificar lugar) *</label>
+                <textarea id="condicionDesc" name="descripcionCondicion" rows="3" placeholder="Detalle de la condición insegura..."></textarea>
             </div>
             <div class="form-group">
                 <label>Evidencia Fotográfica *</label>
@@ -344,7 +344,6 @@
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Jenniffer Basulto Espadas"> Ing. Jenniffer Basulto Espadas</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="QI. Sergio Alberto Maldonado Perez"> QI. Sergio Alberto Maldonado Perez</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Carlos Eduardo Olivera Calderon"> Biol. Carlos Eduardo Olivera Calderon</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Dr. Álvaro Arellano López"> Dr. Álvaro Arellano López</label>
                 </div>
             </div>
         </div>
@@ -438,7 +437,7 @@
         
         // Nueva lógica para Trabajo de Alto Riesgo
         if (tipo === 'altoRiesgo') {
-            const urlOtroCuestionario = "file:///C:/Users/monitoreocol/Desktop/PRUEBAS/index.html"; // REEMPLAZA ESTO
+            const urlOtroCuestionario = "https://observacionesseg.github.io/Trabajos-de-alto-riego/"; // REEMPLAZA ESTO
             window.location.href = urlOtroCuestionario;
             return;
         }
@@ -566,7 +565,7 @@
         
         doc.setFontSize(11);
         doc.setTextColor(100);
-        doc.text("SISTEMA DE GESTIÓN DE SEGURIDAD Y SALUD OCUPACIONAL", 45, 23);
+        doc.text("SEGURIDAD Y SALUD OCUPACIONAL", 45, 23);
         
         doc.setDrawColor(0, 35, 68);
         doc.setLineWidth(0.5);
@@ -575,7 +574,7 @@
         // --- 2. INFORMACIÓN GENERAL (TABLA AUDITABLE) ---
         doc.autoTable({
             startY: 35,
-            head: [[{ content: 'CÉDULA DE REPORTE: CONDICIÓN INSEGURA', colSpan: 2, styles: { halign: 'center' } }]],
+            head: [[{ content: 'REPORTE: CONDICIÓN INSEGURA', colSpan: 2, styles: { halign: 'center' } }]],
             body: [
                 ['FECHA DE REGISTRO:', datos.fecha],
                 ['SEMANA CORRESPONDIENTE:', datos.semana],
@@ -631,3 +630,4 @@
 </script>
 </body>
 </html>
+
