@@ -19,83 +19,39 @@
             --texto: #0f172a;
         }
 
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: #e2e8f0; 
-            padding: 15px; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-        }
-
-        .container { 
-            max-width: 850px; 
-            width: 100%; 
-            background: var(--blanco); 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            overflow: hidden; 
-            margin: 20px 0; 
-        }
-
-        .header { 
-            background-color: var(--night-blue); 
-            padding: 30px 40px; 
-            color: white; 
-            display: flex; 
-            flex-direction: row; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 20px; 
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; background: #e2e8f0; padding: 15px; margin: 0; display: flex; justify-content: center; }
+        .container { max-width: 850px; width: 100%; background: var(--blanco); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; margin: 20px 0; }
+        
+        .header { background-color: var(--night-blue); padding: 30px 40px; color: white; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
         .header h1 { margin: 0; font-size: 1.6rem; text-transform: uppercase; flex: 1; }
-        .header img { max-height: 110px; width: auto; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2)); }
+        .header img { max-height: 80px; width: auto; }
 
         form { padding: 30px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-        @media (max-width: 600px) {
-            .header { flex-direction: column-reverse; text-align: center; padding: 20px; }
-            .grid-2 { grid-template-columns: 1fr; }
-            form { padding: 20px; }
-        }
-
         .form-group { margin-bottom: 18px; }
         .section { margin: 25px 0; padding: 20px; border-radius: 12px; background-color: var(--gris-fondo); border-left: 5px solid var(--night-blue); }
         
         h3 { color: var(--night-blue); font-size: 1.1rem; margin-top: 0; border-bottom: 1px solid var(--borde); padding-bottom: 10px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; color: #334155; }
+        
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--borde); border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        input:focus { border-color: var(--azul-acento); outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
 
-        input, select, textarea { 
-            width: 100%; padding: 12px; border: 1px solid var(--borde); 
-            border-radius: 8px; font-size: 1rem; background: white; box-sizing: border-box; 
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none; border-color: var(--azul-acento); box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-
-        .checkbox-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 8px; padding: 12px; background: white; border-radius: 8px; border: 1px solid var(--borde); 
-            max-height: 200px; overflow-y: auto; 
-        }
-
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; padding: 12px; background: white; border-radius: 8px; border: 1px solid var(--borde); max-height: 200px; overflow-y: auto; }
         .checkbox-item { display: flex; align-items: center; font-size: 0.85rem; gap: 8px; }
         .checkbox-item input { width: auto; }
 
-        button { 
-            width: 100%; background: var(--night-blue); color: white; padding: 16px; 
-            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; 
-            cursor: pointer; transition: background 0.3s; margin-top: 20px; 
-        }
-
+        button { width: 100%; background: var(--night-blue); color: white; padding: 16px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
         button:hover { background: var(--azul-claro); }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        button:disabled { background: #94a3b8; }
         
         .hidden { display: none; }
-        .semana-badge { background: #e2e8f0; font-weight: bold; color: var(--night-blue); text-align: center; cursor: default; }
+        .semana-badge { background: #e2e8f0; font-weight: bold; color: var(--night-blue); text-align: center; }
+
+        @media (max-width: 600px) {
+            .header { flex-direction: column-reverse; text-align: center; padding: 20px; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -103,7 +59,7 @@
 <div class="container">
     <div class="header">
         <h1>Observaciones de Seguridad ISYSA</h1>
-        <img id="logoForm" src="TU_LOGO_AQUI" alt="ISYSA"> 
+        <img src="URL_DE_TU_LOGO" alt="LOGO">
     </div>
 
     <form id="seguridadForm">
@@ -131,7 +87,7 @@
             </div>
             <div class="form-group">
                 <label>Semana del Año</label>
-                <input type="text" id="numSemana" name="semana" class="semana-badge" readonly placeholder="Calculando...">
+                <input type="text" id="numSemana" name="semana" class="semana-badge" readonly>
             </div>
         </div>
 
@@ -140,35 +96,28 @@
             <select name="sitio" id="sitioSelect" onchange="toggleOtroLugar()" required>
                 <option value="">Seleccione lugar...</option>
                 <option value="Almacén">Almacén</option>
-                <option value="Biología">Biología</option>
-                <option value="Calidad">Calidad</option>
                 <option value="Campo">Campo</option>
-                <option value="Embarques">Embarques</option>
                 <option value="Lavadoras">Lavadoras</option>
                 <option value="Molinos">Molinos</option>
-                <option value="Oficinas">Oficinas</option>
-                <option value="Registro (Vigilancia)">Registro (Vigilancia)</option>
                 <option value="Mantto. Industrial">Mantto. Industrial</option>
-                <option value="Mantto. Automotriz">Mantto. Automotriz</option>
-                <option value="Transporte">Transporte</option>
                 <option value="Otro">Otro</option>
             </select>
-            <input type="text" name="otroSitio" id="otroSitio" class="hidden" style="margin-top:10px" placeholder="Especifique el lugar">
+            <input type="text" name="otroSitio" id="otroSitio" class="hidden" style="margin-top:10px" placeholder="Especifique lugar">
         </div>
 
         <div class="form-group">
             <label>Observador *</label>
-            <input type="text" name="observador" placeholder="Nombre de quien observa" required>
+            <input type="text" name="observador" placeholder="Tu nombre" required>
         </div>
 
         <div id="seccionActo" class="section hidden">
             <h3>I. OBSERVACIÓN DE SEGURIDAD</h3>
             <div class="form-group">
                 <label>Persona Observada *</label>
-                <input type="text" name="observado" id="inputObservado" placeholder="Nombre de quien es observado">
+                <input type="text" name="observado" id="inputObservado">
             </div>
             <div class="form-group">
-                <label>¿Realiza su actividad de forma segura?</label>
+                <label>¿Actividad Segura?</label>
                 <select name="actividadSegura" id="actividadSegura" onchange="toggleEvita()">
                     <option value="SI">SÍ</option>
                     <option value="NO">NO</option>
@@ -176,17 +125,10 @@
             </div>
             <div id="queEvita" class="form-group hidden">
                 <label>¿Qué evita la seguridad?</label>
-                <select name="razonInsegura" id="razonInseguraSelect" onchange="toggleOtroRazon()">
-                    <option value="">-- Seleccione razón --</option>
-                    <option value="Herramientas inadecuadas">Herramientas inadecuadas</option>
-                    <option value="Falta de capacitación">Falta de capacitación</option>
-                    <option value="EPP no disponible">EPP no disponible</option>
-                    <option value="Otro">Otro</option>
-                </select>
-                <input type="text" name="otroRazonInsegura" id="otroRazonInsegura" class="hidden" style="margin-top:10px" placeholder="Especifique razón">
+                <textarea name="razonInsegura"></textarea>
             </div>
             <div class="form-group">
-                <label>Subir fotografía de observación *</label>
+                <label>Foto de Observación *</label>
                 <input type="file" id="fotoTrabajador" accept="image/*">
             </div>
         </div>
@@ -195,12 +137,12 @@
             <h3>II. CONDICIÓN INSEGURA</h3>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Equipo o Zona Afectada *</label>
-                    <input type="text" id="equipoAfectado" name="equipoAfectado" placeholder="Ej. Molino 1">
+                    <label>Equipo/Zona *</label>
+                    <input type="text" id="equipoAfectado" name="equipoAfectado">
                 </div>
                 <div class="form-group">
-                    <label>Prioridad de Atención *</label>
-                    <select id="prioridadCondicion" name="prioridad">
+                    <label>Prioridad *</label>
+                    <select name="prioridad">
                         <option value="Baja">Baja</option>
                         <option value="Media">Media</option>
                         <option value="Alta">Alta</option>
@@ -209,27 +151,17 @@
             </div>
             <div class="form-group">
                 <label>Descripción del hallazgo *</label>
-                <textarea id="condicionDesc" name="descripcionCondicion" rows="3" placeholder="Detalle técnico..."></textarea>
+                <textarea id="condicionDesc" name="descripcionCondicion" rows="3"></textarea>
             </div>
             <div class="form-group">
-                <label>Evidencia Fotográfica *</label>
+                <label>Foto de Evidencia *</label>
                 <input type="file" id="fotoFile" accept="image/*">
             </div>
             <div class="form-group">
-                <label>Responsables (Seleccione al menos uno) *</label>
-                <div class="checkbox-grid" id="gridResponsables">
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Leonel De Jesus Perera Ak"> Biol. Leonel De Jesus Perera Ak</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Lic. Rafael Jesus Perez Avila"> Lic. Rafael Jesus Perez Avila</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="QI. Gustavo Jauregui Mejia"> QI. Gustavo Jauregui Mejia</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Mario Guzman Ordaz"> Ing. Mario Guzman Ordaz</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Roberto Daniel Orozco De La Cruz"> Ing. Roberto Daniel Orozco De La Cruz</label>
+                <label>Responsables (Seleccione) *</label>
+                <div class="checkbox-grid">
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Alberto Pastor Zamudio Rodriguez"> Ing. Alberto Pastor Zamudio Rodriguez</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Julio Cesar Lopez Poot"> Ing. Julio Cesar Lopez Poot</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Imer Sebastian Maldonado Marrufo"> Ing. Imer Sebastian Maldonado Marrufo</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Jorge Urbano Hernandez Muro"> Ing. Jorge Urbano Hernandez Muro</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Jenniffer Basulto Espadas"> Ing. Jenniffer Basulto Espadas</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="QI. Sergio Alberto Maldonado Perez"> QI. Sergio Alberto Maldonado Perez</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Carlos Eduardo Olivera Calderon"> Biol. Carlos Eduardo Olivera Calderon</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Leonel De Jesus Perera Ak"> Biol. Leonel De Jesus Perera Ak</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Comisión de Seguridad e Higiene"> Comisión de Seguridad e Higiene</label>
                 </div>
             </div>
@@ -238,78 +170,33 @@
         <button type="submit" id="btnEnviar">Guardar Reporte</button>
     </form>
 </div>
-<script>
+    <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyFLiX7xzDLkb7vaoMigSJouXpBFhGB-7UNRYT60N-GqODJf6-hQFIlHW305UgWFv3L/exec";
     
-    // 1. LISTAS DE PERSONAL (Añade o quita nombres aquí)
-    const personalISYSA = [
-        "Biol. Leonel De Jesus Perera Ak",
-        "Lic. Rafael Jesus Perez Avila",
-        "QI. Gustavo Jauregui Mejia",
-        "Ing. Mario Guzman Ordaz",
-        "Ing. Roberto Daniel Orozco De La Cruz",
-        "Ing. Alberto Pastor Zamudio Rodriguez",
-        "Ing. Julio Cesar Lopez Poot",
-        "Ing. Imer Sebastian Maldonado Marrufo",
-        "Ing. Jorge Urbano Hernandez Muro",
-        "Ing. Jenniffer Basulto Espadas",
-        "QI. Sergio Alberto Maldonado Perez",
-        "Biol. Carlos Eduardo Olivera Calderon"
-    ];
-
+    // Configuración de Correos
     const emailsResponsables = {
-        "Biol. Leonel De Jesus Perera Ak": "campo.cosecha@isysa.com.mx",
-        "Lic. Rafael Jesus Perez Avila": "cjeferi@isysa.com.mx",
-        "QI. Gustavo Jauregui Mejia": "gjauregui@isysa.com.mx",
-        "Ing. Mario Guzman Ordaz": "transportecol@isysa.com.mx",
-        "Ing. Roberto Daniel Orozco De La Cruz": "rorozco@isysa.com.mx",
         "Ing. Alberto Pastor Zamudio Rodriguez": "mindustrial@isysa.com.mx",
-        "Ing. Julio Cesar Lopez Poot": "lavadoras@isysa.com.mx",
-        "Ing. Imer Sebastian Maldonado Marrufo": "jefealmcol@isysa.com.mx",
-        "Ing. Jorge Urbano Hernandez Muro": "tautomotrizcol@isysa.com.mx",
-        "Ing. Jenniffer Basulto Espadas": "molinoscol@isysa.com.mx",
-        "QI. Sergio Alberto Maldonado Perez": "smaldonado@isysa.com.mx",
-        "Biol. Carlos Eduardo Olivera Calderon": "biologia@isysa.com.mx",
+        "Biol. Leonel De Jesus Perera Ak": "campo.cosecha@isysa.com.mx",
         "Comisión de Seguridad e Higiene": "cshisysa@gmail.com"
+        // Agrega el resto aquí siguiendo el mismo formato
     };
 
-    // 2. INICIALIZACIÓN
+    // Funciones de Inicialización
     window.onload = () => {
         const hoy = new Date();
-        const offset = hoy.getTimezoneOffset() * 60000;
-        const localISODate = (new Date(hoy - offset)).toISOString().split('T')[0];
-        document.getElementById('fechaActual').value = localISODate;
-        
+        document.getElementById('fechaActual').value = hoy.toISOString().split('T')[0];
         actualizarNumeroSemana();
-        cargarListas(); // <-- ESTO ES LO QUE FALTABA
     };
 
-    function cargarListas() {
-        // Llenar el datalist de Observadores y de Observados (en sección Acto)
-        const listas = ["listaObservadores", "listaObservados"];
-        listas.forEach(id => {
-            const datalist = document.getElementById(id);
-            if (datalist) {
-                datalist.innerHTML = ""; // Limpiar
-                personalISYSA.sort().forEach(nombre => {
-                    const option = document.createElement("option");
-                    option.value = nombre;
-                    datalist.appendChild(option);
-                });
-            }
-        });
-    }
-
-    // 3. FUNCIONES DE INTERFAZ
     function actualizarNumeroSemana() {
-        const fechaInput = document.getElementById('fechaActual').value;
-        if (!fechaInput) return;
-        const date = new Date(fechaInput + "T00:00:00");
-        const target = new Date(date.valueOf());
-        const dayNr = (date.getDay() + 6) % 7;
-        target.setDate(target.getDate() + 4 - dayNr);
-        const jan4 = new Date(target.getFullYear(), 0, 4);
-        const numSemana = 1 + Math.ceil((target - jan4) / 86400000 / 7);
+        const f = document.getElementById('fechaActual').value;
+        if (!f) return;
+        const d = new Date(f + "T00:00:00");
+        const t = new Date(d.valueOf());
+        const dayNr = (d.getDay() + 6) % 7;
+        t.setDate(t.getDate() + 4 - dayNr);
+        const jan4 = new Date(t.getFullYear(), 0, 4);
+        const numSemana = 1 + Math.ceil((t - jan4) / 86400000 / 7);
         document.getElementById('numSemana').value = "Semana " + numSemana;
     }
 
@@ -323,25 +210,16 @@
         document.getElementById('seccionCondicion').classList.toggle('hidden', tipo !== 'condicion');
     }
 
+    // Toggles adicionales (Otros, Evita, etc)
     function toggleOtroLugar() { 
         const s = document.getElementById('sitioSelect'); 
         const i = document.getElementById('otroSitio');
         i.classList.toggle('hidden', s.value !== 'Otro');
         i.required = (s.value === 'Otro');
     }
+    function toggleEvita() { document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI'); }
 
-    function toggleOtroRazon() {
-        const s = document.getElementById('razonInseguraSelect');
-        const i = document.getElementById('otroRazonInsegura');
-        i.classList.toggle('hidden', s.value !== 'Otro');
-        i.required = (s.value === 'Otro');
-    }
-
-    function toggleEvita() {
-        document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI');
-    }
-
-    // 4. COMPRESIÓN Y ENVÍO
+    // COMPRESIÓN DE IMAGEN
     async function comprimirImagen(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -363,16 +241,17 @@
         });
     }
 
+    // ENVÍO DE FORMULARIO
     document.getElementById('seguridadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('btnEnviar');
         const tipo = document.getElementById('tipoObservacion').value;
         const fotoInput = (tipo === 'acto') ? document.getElementById('fotoTrabajador') : document.getElementById('fotoFile');
 
-        if (fotoInput.files.length === 0) return alert("Debe subir una fotografía obligatoria.");
+        if (!fotoInput.files[0]) return alert("Debe subir una fotografía obligatoria.");
 
         btn.disabled = true;
-        btn.innerText = "ENVIANDO...";
+        btn.innerText = "PROCESANDO... ESPERE";
 
         try {
             const base64Foto = await comprimirImagen(fotoInput.files[0]);
@@ -382,26 +261,25 @@
             payload.fotografia = base64Foto;
             payload.horaReporte = new Date().toLocaleTimeString();
 
-            // Mapeo de responsables
+            // Lógica de responsables
             const seleccionados = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value);
             payload.responsables = seleccionados.join(", ");
             payload.emailsResponsables = seleccionados.map(n => emailsResponsables[n] || "").filter(em => em).join(",");
 
-            if (payload.sitio === 'Otro') payload.sitio = payload.otroSitio;
-
+            // 1. Enviar a Google Sheets
             await fetch(scriptURL, { method: 'POST', body: new URLSearchParams(payload), mode: 'no-cors' });
 
+            // 2. Generar PDF (Solo Condición)
             if (tipo === 'condicion') {
                 await generarPDF(payload);
             }
 
-            alert("✅ Guardado correctamente.");
+            alert("✅ Reporte guardado con éxito.");
             location.reload();
-        } catch (error) {
-            console.error(error);
-            alert("❌ Error al enviar.");
+        } catch (err) {
+            console.error(err);
+            alert("❌ Error al procesar.");
             btn.disabled = false;
-            btn.innerText = "Guardar Reporte";
         }
     });
 
@@ -409,18 +287,23 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFontSize(16);
-        doc.setTextColor(0, 35, 68);
-        doc.text("REPORTE DE SEGURIDAD ISYSA", 105, 20, { align: "center" });
+        doc.text("REPORTE DE CONDICIÓN INSEGURA", 105, 20, { align: "center" });
+        
         doc.autoTable({
             startY: 30,
             body: [
-                ["Fecha", d.fecha], ["Ubicación", d.sitio], ["Observador", d.observador],
-                ["Prioridad", d.prioridad], ["Hallazgo", d.descripcionCondicion]
+                ["Fecha/Hora", `${d.fecha} ${d.horaReporte}`],
+                ["Ubicación", d.sitio],
+                ["Responsables", d.responsables],
+                ["Descripción", d.descripcionCondicion]
             ],
             theme: 'grid'
         });
-        if (d.fotografia) doc.addImage(d.fotografia, 'JPEG', 15, doc.lastAutoTable.finalY + 10, 70, 50);
-        doc.save(`Reporte_ISYSA_${d.fecha}.pdf`);
+
+        if (d.fotografia) {
+            doc.addImage(d.fotografia, 'JPEG', 15, doc.lastAutoTable.finalY + 10, 80, 60);
+        }
+        doc.save(`Reporte_${d.fecha}.pdf`);
     }
 </script>
 </body>
