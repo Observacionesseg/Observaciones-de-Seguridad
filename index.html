@@ -53,7 +53,9 @@
         .header h1 { 
             margin: 0; 
             font-size: 1.6rem; 
+            letter-spacing: 1px;
             text-transform: uppercase;
+            text-align: left;
             flex: 1;
         }
 
@@ -72,8 +74,10 @@
         }
 
         @media (max-width: 600px) {
+            .header { flex-direction: column-reverse; text-align: center; padding: 20px; }
+            .header h1 { text-align: center; font-size: 1.2rem; }
             .grid-2 { grid-template-columns: 1fr; }
-            .header { flex-direction: column-reverse; text-align: center; }
+            form { padding: 20px; }
         }
 
         .form-group { margin-bottom: 18px; }
@@ -88,18 +92,41 @@
 
         h3 { 
             color: var(--night-blue);
+            font-size: 1.1rem;
+            margin-top: 0;
             border-bottom: 1px solid var(--borde);
             padding-bottom: 10px;
         }
 
-        label { display: block; margin-bottom: 6px; font-weight: 600; }
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 600; 
+            font-size: 0.9rem;
+            color: #334155;
+        }
 
         input, select, textarea { 
             width: 100%; 
             padding: 12px; 
             border: 1px solid var(--borde); 
             border-radius: 8px; 
+            font-size: 1rem;
+            background: white;
             box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--azul-acento);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .semana-badge {
+            background: #e2e8f0;
+            font-weight: bold;
+            color: var(--night-blue);
+            text-align: center;
         }
 
         .checkbox-grid { 
@@ -109,12 +136,18 @@
             padding: 12px;
             background: white;
             border-radius: 8px;
+            border: 1px solid var(--borde);
             max-height: 200px;
             overflow-y: auto;
-            border: 1px solid var(--borde);
         }
 
-        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .checkbox-item { 
+            display: flex; 
+            align-items: center;
+            font-size: 0.85rem;
+            gap: 8px;
+        }
+
         .checkbox-item input { width: auto; }
 
         button { 
@@ -124,14 +157,25 @@
             padding: 16px; 
             border: none; 
             border-radius: 8px; 
+            font-size: 1rem; 
             font-weight: bold;
             cursor: pointer; 
+            transition: background 0.3s;
             margin-top: 20px;
         }
 
-        button:disabled { background: #94a3b8; }
+        button:hover { background: var(--azul-claro); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
         .hidden { display: none; }
         .mt-2 { margin-top: 10px; }
+
+        .file-label {
+            font-size: 0.8rem;
+            color: var(--azul-claro);
+            margin-top: 5px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -139,7 +183,7 @@
 <div class="container">
     <div class="header">
         <h1>Observaciones de Seguridad ISYSA</h1>
-        <img id="logoForm" src="" alt="ISYSA">
+        <img id="logoForm" src="" alt="ISYSA"> 
     </div>
 
     <form id="seguridadForm">
@@ -167,7 +211,7 @@
             </div>
             <div class="form-group">
                 <label>Semana del Año</label>
-                <input type="text" id="numSemana" name="semana" readonly style="background:#e2e8f0; text-align:center; font-weight:bold;">
+                <input type="text" id="numSemana" name="semana" class="semana-badge" readonly>
             </div>
         </div>
 
@@ -202,28 +246,62 @@
             <h3>I. OBSERVACIÓN DE SEGURIDAD</h3>
             <div class="form-group">
                 <label>Persona Observada *</label>
-                <input type="text" list="listaObservados" name="observado" id="inputObservado">
+                <input type="text" list="listaObservados" name="observado" id="inputObservado" placeholder="Nombre de quien es observado">
                 <datalist id="listaObservados"></datalist>
             </div>
             <div class="form-group">
-                <label>¿Actividad segura?</label>
+                <label>¿Realiza su actividad de forma segura?</label>
                 <select name="actividadSegura" id="actividadSegura" onchange="toggleEvita()">
                     <option value="SI">SÍ</option>
                     <option value="NO">NO</option>
                 </select>
             </div>
             <div id="queEvita" class="form-group hidden">
-                <label>¿Qué evita la seguridad?</label>
+                <label>¿Qué evita que el trabajador realice sus actividades de forma segura?</label>
                 <select name="razonInsegura" id="razonInseguraSelect" onchange="toggleOtroRazon()">
-                    <option value="">-- Seleccione --</option>
-                    <option value="Herramientas inadecuadas">Herramientas inadecuadas</option>
-                    <option value="Falta capacitación">Falta capacitación</option>
+                    <option value="">-- Seleccione una razón --</option>
+                    <option value="Herramientas, equipos o maquinaria inadecuados, no disponibles o en malas condiciones">Herramientas, equipos o maquinaria inadecuados, no disponibles o en malas condiciones</option>
+                    <option value="Diseño inadecuado de las instalaciones.">Diseño inadecuado de las instalaciones.</option>
+                    <option value="Diseño inadecuado del proceso">Diseño inadecuado del proceso</option>
+                    <option value="Equipo de protección personal no disponible o nunca solicitado">Equipo de protección personal no disponible o nunca solicitado</option>
+                    <option value="Nunca ha recibido capacitación al respecto">Nunca ha recibido capacitación al respecto</option>
                     <option value="Otro">Otro</option>
                 </select>
-                <input type="text" id="otroRazonInsegura" class="hidden mt-2">
+                <input type="text" name="otroRazonInsegura" id="otroRazonInsegura" class="hidden mt-2" placeholder="Especifique la razón">
             </div>
             <div class="form-group">
-                <label>Subir foto de observación *</label>
+                <label>¿Se cuenta con lo necesario para hacer la actividad de forma segura?</label>
+                <select name="provisto" id="provistoSelect" onchange="toggleProvisto()">
+                    <option value="SI">SÍ</option>
+                    <option value="NO">NO</option>
+                </select>
+            </div>
+            <div id="queFalta" class="form-group hidden">
+                <label>Especifique faltante:</label>
+                <div class="checkbox-grid">
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Capacitación"> Capacitación</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Herramientas"> Herramientas</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="EPP"> Equipo de Protección (EPP)</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Materiales"> Materiales</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Equipos adecuados"> Equipos adecuados</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Análisis"> Falta el análisis previo</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Controles"> Falta instalar controles</label>
+                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Otro" id="checkOtroFaltante" onchange="toggleOtroFaltante()"> Otro</label>
+                </div>
+                <input type="text" name="otroFaltante" id="otroFaltante" class="hidden mt-2" placeholder="Especifique qué falta">
+            </div>
+            <div class="form-group">
+                <label>Estado identificado:</label>
+                <select name="estadoComportamiento">
+                    <option value="Ninguno">Ninguno</option>
+                    <option value="Fatiga">Fatiga</option>
+                    <option value="Prisa">Prisa</option>
+                    <option value="Frustración">Frustración</option>
+                    <option value="Exceso de confianza">Exceso de confianza</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Subir fotografía de observación realizada *</label>
                 <input type="file" id="fotoTrabajador" accept="image/*">
             </div>
         </div>
@@ -232,20 +310,20 @@
             <h3>II. CONDICIÓN INSEGURA</h3>
             <div class="grid-2">
                 <div class="form-group">
-                    <label>Equipo/Zona *</label>
-                    <input type="text" id="equipoAfectado" name="equipoAfectado">
+                    <label>Equipo o Zona Afectada *</label>
+                    <input type="text" id="equipoAfectado" name="equipoAfectado" placeholder="Ej. Molino 1">
                 </div>
                 <div class="form-group">
-                    <label>Prioridad *</label>
+                    <label>Prioridad de Atención *</label>
                     <select id="prioridadCondicion" name="prioridad">
-                        <option value="Baja">Baja</option>
-                        <option value="Media">Media</option>
-                        <option value="Alta">Alta</option>
+                        <option value="Baja">Baja (Riesgo controlado)</option>
+                        <option value="Media">Media (Atención pronta)</option>
+                        <option value="Alta">Alta (Riesgo Inmediato)</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
-                <label>Descripción *</label>
+                <label>Descripción de la condición (hallazgo) *</label>
                 <textarea id="condicionDesc" name="descripcionCondicion" rows="3"></textarea>
             </div>
             <div class="form-group">
@@ -253,12 +331,20 @@
                 <input type="file" id="fotoFile" accept="image/*">
             </div>
             <div class="form-group">
-                <label>Responsables (Mínimo uno) *</label>
-                <div class="checkbox-grid">
+                <label>Responsables de atención *</label>
+                <div class="checkbox-grid" id="gridResponsables">
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Leonel De Jesus Perera Ak"> Biol. Leonel De Jesus Perera Ak</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Lic. Rafael Jesus Perez Avila"> Lic. Rafael Jesus Perez Avila</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="QI. Gustavo Jauregui Mejia"> QI. Gustavo Jauregui Mejia</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Mario Guzman Ordaz"> Ing. Mario Guzman Ordaz</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Roberto Daniel Orozco De La Cruz"> Ing. Roberto Daniel Orozco De La Cruz</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Alberto Pastor Zamudio Rodriguez"> Ing. Alberto Pastor Zamudio Rodriguez</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Julio Cesar Lopez Poot"> Ing. Julio Cesar Lopez Poot</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Imer Sebastian Maldonado Marrufo"> Ing. Imer Sebastian Maldonado Marrufo</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Jorge Urbano Hernandez Muro"> Ing. Jorge Urbano Hernandez Muro</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Jenniffer Basulto Espadas"> Ing. Jenniffer Basulto Espadas</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="QI. Sergio Alberto Maldonado Perez"> QI. Sergio Alberto Maldonado Perez</label>
+                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Carlos Eduardo Olivera Calderon"> Biol. Carlos Eduardo Olivera Calderon</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Comisión de Seguridad e Higiene"> Comisión de Seguridad e Higiene</label>
                 </div>
             </div>
@@ -269,34 +355,47 @@
 </div>
 
 <script>
+    // --- CONFIGURACIÓN ---
     const scriptURL = "https://script.google.com/macros/s/AKfycbyFLiX7xzDLkb7vaoMigSJouXpBFhGB-7UNRYT60N-GqODJf6-hQFIlHW305UgWFv3L/exec";
-    
-    // PEGAR AQUÍ TUS BASE64
-    const LOGO_BASE64 = ""; 
-    const FIRMA_COORDINADOR_BASE64 = "";
+    const LOGO_BASE64 = ""; // PEGAR AQUÍ BASE64 DEL LOGO
+    const FIRMA_COORDINADOR_BASE64 = ""; // PEGAR AQUÍ BASE64 DE LA FIRMA
 
     const emailsResponsables = {
         "Biol. Leonel De Jesus Perera Ak": "campo.cosecha@isysa.com.mx",
         "Lic. Rafael Jesus Perez Avila": "cjeferi@isysa.com.mx",
+        "QI. Gustavo Jauregui Mejia": "gjauregui@isysa.com.mx",
+        "Ing. Mario Guzman Ordaz": "transportecol@isysa.com.mx",
+        "Ing. Roberto Daniel Orozco De La Cruz": "rorozco@isysa.com.mx",
         "Ing. Alberto Pastor Zamudio Rodriguez": "mindustrial@isysa.com.mx",
-        "Ing. Julio Cesar Lopez Poot": "lavadoras@isysa.com.mx"
+        "Ing. Julio Cesar Lopez Poot": "lavadoras@isysa.com.mx",
+        "Ing. Imer Sebastian Maldonado Marrufo": "jefealmcol@isysa.com.mx",
+        "Ing. Jorge Urbano Hernandez Muro": "tautomotrizcol@isysa.com.mx",
+        "Ing. Jenniffer Basulto Espadas": "molinoscol@isysa.com.mx",
+        "QI. Sergio Alberto Maldonado Perez": "smaldonado@isysa.com.mx",
+        "Biol. Carlos Eduardo Olivera Calderon": "biologia@isysa.com.mx"
     };
 
     window.onload = () => {
         const hoy = new Date();
-        document.getElementById('fechaActual').value = hoy.toISOString().split('T')[0];
+        const offset = hoy.getTimezoneOffset() * 60000;
+        const localISO = (new Date(hoy - offset)).toISOString().split('T')[0];
+        document.getElementById('fechaActual').value = localISO;
         if(LOGO_BASE64) document.getElementById('logoForm').src = LOGO_BASE64;
         actualizarNumeroSemana();
         cargarListas();
     };
 
+    // --- FUNCIONES DE APOYO ---
     function actualizarNumeroSemana() {
         const f = document.getElementById('fechaActual').value;
-        if(!f) return;
+        if (!f) return;
         const d = new Date(f + "T00:00:00");
-        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-        const s = Math.ceil((((d - new Date(d.getFullYear(),0,1)) / 8.64e7) + 1) / 7);
-        document.getElementById('numSemana').value = "Semana " + s;
+        const target = new Date(d.valueOf());
+        const dayNr = (d.getDay() + 6) % 7;
+        target.setDate(target.getDate() + 4 - dayNr);
+        const jan4 = new Date(target.getFullYear(), 0, 4);
+        const diff = (target - jan4) / 86400000;
+        document.getElementById('numSemana').value = "Semana " + (1 + Math.ceil(diff / 7));
     }
 
     async function cargarListas() {
@@ -305,64 +404,125 @@
             const d = await r.json();
             if(d.observadores) d.observadores.forEach(n => { let o = document.createElement('option'); o.value = n; document.getElementById('listaObservadores').appendChild(o); });
             if(d.observados) d.observados.forEach(n => { let o = document.createElement('option'); o.value = n; document.getElementById('listaObservados').appendChild(o); });
-        } catch(e) {}
+        } catch (e) { console.log("Listas no cargadas"); }
     }
 
+    // --- COMPRESIÓN DE IMAGEN ---
+    async function comprimirImagen(base64, maxWidth = 800) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const scale = maxWidth / img.width;
+                canvas.width = maxWidth;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+        });
+    }
+
+    function getImageDimensions(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+            img.src = url;
+        });
+    }
+
+    // --- INTERFAZ DINÁMICA ---
     function toggleSections() {
         const t = document.getElementById('tipoObservacion').value;
-        if(t === 'altoRiesgo') { window.location.href = "https://observacionesseg.github.io/Trabajos-de-alto-riego/"; return; }
-        document.getElementById('seccionActo').classList.toggle('hidden', t !== 'acto');
-        document.getElementById('seccionCondicion').classList.toggle('hidden', t !== 'condicion');
+        if (t === 'altoRiesgo') { window.location.href = "https://observacionesseg.github.io/Trabajos-de-alto-riego/"; return; }
+        
+        const sa = document.getElementById('seccionActo');
+        const sc = document.getElementById('seccionCondicion');
+        sa.classList.toggle('hidden', t !== 'acto');
+        sc.classList.toggle('hidden', t !== 'condicion');
+
+        // Reset y Requireds dinámicos
+        const inputs = document.querySelectorAll('.section input, .section select, .section textarea');
+        inputs.forEach(i => {
+            const isVisible = !i.closest('.hidden');
+            if(i.type !== 'checkbox') {
+                if(i.id === 'inputObservado' || i.id === 'fotoTrabajador' || i.id === 'equipoAfectado' || i.id === 'condicionDesc' || i.id === 'fotoFile') {
+                    i.required = isVisible;
+                }
+            }
+        });
     }
 
     function toggleOtroLugar() { 
         const s = document.getElementById('sitioSelect');
-        document.getElementById('otroSitio').classList.toggle('hidden', s.value !== 'Otro');
+        const o = document.getElementById('otroSitio');
+        o.classList.toggle('hidden', s.value !== 'Otro');
+        o.required = (s.value === 'Otro');
     }
 
     function toggleOtroRazon() {
-        document.getElementById('otroRazonInsegura').classList.toggle('hidden', document.getElementById('razonInseguraSelect').value !== 'Otro');
+        const s = document.getElementById('razonInseguraSelect');
+        const o = document.getElementById('otroRazonInsegura');
+        o.classList.toggle('hidden', s.value !== 'Otro');
     }
 
-    function toggleEvita() {
-        document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI');
+    function toggleOtroFaltante() {
+        const c = document.getElementById('checkOtroFaltante');
+        const o = document.getElementById('otroFaltante');
+        o.classList.toggle('hidden', !c.checked);
     }
 
+    function toggleProvisto() { document.getElementById('queFalta').classList.toggle('hidden', document.getElementById('provistoSelect').value === 'SI'); }
+    function toggleEvita() { document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI'); }
+
+    // --- ENVÍO Y PROCESAMIENTO ---
     document.getElementById('seguridadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const btn = document.getElementById('btnEnviar');
         const tipo = document.getElementById('tipoObservacion').value;
+        const btn = document.getElementById('btnEnviar');
         const fotoInput = (tipo === 'acto') ? document.getElementById('fotoTrabajador') : document.getElementById('fotoFile');
 
-        if(fotoInput.files.length === 0) { alert("⚠️ Sube la foto."); return; }
+        if(fotoInput.files.length === 0) { alert("⚠️ Sube la fotografía obligatoria."); return; }
+        if(tipo === 'condicion' && document.querySelectorAll('.resp-check:checked').length === 0) {
+            alert("⚠️ Selecciona al menos un responsable."); return;
+        }
 
-        btn.innerText = "ENVIANDO DATOS...";
+        btn.innerText = "COMPRIMIENDO IMAGEN...";
         btn.disabled = true;
 
         const payload = Object.fromEntries(new FormData(this));
+        payload.horaReporte = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         payload.semana = payload.semana.replace("Semana ", "");
         if(payload.sitio === 'Otro') payload.sitio = document.getElementById('otroSitio').value;
-        
-        const seleccionados = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value);
-        payload.responsables = seleccionados.join(", ");
-        payload.emailsResponsables = seleccionados.map(n => emailsResponsables[n] || "").filter(e => e).join(",");
-        payload.horaReporte = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        if(payload.razonInsegura === 'Otro') payload.razonInsegura = payload.otroRazonInsegura;
+
+        // Checkboxes faltantes
+        payload.falta = Array.from(document.querySelectorAll('input[name="falta"]:checked')).map(cb => 
+            cb.value === 'Otro' ? "Otro: " + document.getElementById('otroFaltante').value : cb.value
+        ).join(", ");
+
+        // Responsables y Emails
+        const resps = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value.trim());
+        payload.responsables = resps.join(", ");
+        payload.emailsResponsables = resps.map(n => emailsResponsables[n] || "").filter(em => em).join(",");
 
         const reader = new FileReader();
         reader.onload = async (ev) => {
-            payload.fotografia = ev.target.result;
+            payload.fotografia = await comprimirImagen(ev.target.result);
             
-            // PROCESO: 1. Fetch -> 2. PDF -> 3. Reload
+            if(tipo === 'condicion') {
+                btn.innerText = "GENERANDO PDF...";
+                await generarPDF(payload);
+            }
+
+            btn.innerText = "ENVIANDO DATOS...";
             try {
                 await fetch(scriptURL, { method: "POST", body: new URLSearchParams(payload), mode: 'no-cors' });
-                if(tipo === 'condicion') {
-                    btn.innerText = "GENERANDO PDF...";
-                    await generarPDF(payload);
-                }
-                alert("✅ Guardado.");
+                alert("✅ Reporte guardado con éxito.");
                 location.reload();
-            } catch(err) {
-                alert("❌ Error.");
+            } catch (err) {
+                alert("❌ Error al enviar.");
                 btn.disabled = false;
                 btn.innerText = "Guardar Reporte";
             }
@@ -370,74 +530,68 @@
         reader.readAsDataURL(fotoInput.files[0]);
     });
 
-    // --- EL FORMATO DE TU PDF ORIGINAL ---
+    // --- GENERACIÓN DE PDF ---
     async function generarPDF(datos) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
+        const pW = doc.internal.pageSize.getWidth();
+        const pH = doc.internal.pageSize.getHeight();
+        const margin = 15;
 
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const marginLeft = 15;
-        const contentWidth = pageWidth - 30;
-
-        // Encabezado Visual
-        if(LOGO_BASE64) doc.addImage(LOGO_BASE64, 'PNG', marginLeft, 12, 25, 15);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.setTextColor(0, 35, 68);
+        // Header
+        if(LOGO_BASE64) doc.addImage(LOGO_BASE64, 'PNG', margin, 12, 25, 15);
+        doc.setFont("helvetica", "bold").setFontSize(14).setTextColor(0, 35, 68);
         doc.text("INDUSTRIA SALINERA DE YUCATÁN S.A. DE C.V.", 45, 18);
-        doc.setFontSize(11);
-        doc.setTextColor(100);
+        doc.setFontSize(11).setTextColor(100);
         doc.text("SEGURIDAD Y SALUD OCUPACIONAL", 45, 23);
-        doc.setDrawColor(0, 35, 68);
-        doc.line(marginLeft, 30, pageWidth - 15, 30);
+        doc.setDrawColor(0, 35, 68).line(margin, 30, pW - margin, 30);
 
-        // Tabla de datos con tu estilo de celdas grises
+        // Tabla
         doc.autoTable({
             startY: 35,
             head: [[{ content: 'REPORTE: CONDICIÓN INSEGURA', colSpan: 2, styles: { halign: 'center' } }]],
             body: [
                 ['FECHA Y HORA:', `${datos.fecha} | ${datos.horaReporte}`],
                 ['SEMANA:', datos.semana],
-                ['UBICACIÓN:', (datos.sitio || '').toUpperCase()],
-                ['EQUIPO / ZONA:', (datos.equipoAfectado || '').toUpperCase()],
-                ['PRIORIDAD:', datos.prioridad],
-                ['REPORTÓ:', (datos.observador || '').toUpperCase()],
+                ['UBICACIÓN:', datos.sitio.toUpperCase()],
+                ['EQUIPO / ZONA:', datos.equipoAfectado.toUpperCase()],
+                ['PRIORIDAD:', datos.prioridad.toUpperCase()],
+                ['REPORTADO POR:', datos.observador.toUpperCase()],
                 ['RESPONSABLES:', datos.responsables]
             ],
             theme: 'grid',
-            headStyles: { fillColor: [0, 35, 68], fontStyle: 'bold' },
-            columnStyles: { 0: { cellWidth: 50, fillColor: [240, 240, 240], fontStyle: 'bold' } },
-            styles: { fontSize: 9, cellPadding: 3 }
+            headStyles: { fillColor: [0, 35, 68] },
+            styles: { fontSize: 9 },
+            columnStyles: { 0: { cellWidth: 50, fontStyle: 'bold', fillColor: [240, 240, 240] } }
         });
 
-        let y = doc.lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
-        doc.setTextColor(0, 35, 68);
-        doc.text("DESCRIPCIÓN DEL HALLAZGO:", marginLeft, y);
-        
+        let cursorY = doc.lastAutoTable.finalY + 10;
+        doc.setFont("helvetica", "bold").text("DESCRIPCIÓN DEL HALLAZGO:", margin, cursorY);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(0);
-        const desc = doc.splitTextToSize(datos.descripcionCondicion || "", contentWidth);
-        doc.text(desc, marginLeft, y + 7);
+        const splitText = doc.splitTextToSize(datos.descripcionCondicion, pW - 30);
+        doc.text(splitText, margin, cursorY + 7);
+        cursorY += (splitText.length * 5) + 12;
 
-        y += (desc.length * 5) + 15;
-
-        // Imagen
-        if (datos.fotografia) {
-            doc.setFont("helvetica", "bold");
-            doc.text("EVIDENCIA:", marginLeft, y - 5);
-            doc.rect(marginLeft, y, contentWidth, 80);
-            doc.addImage(datos.fotografia, 'JPEG', marginLeft + 2, y + 2, contentWidth - 4, 76);
+        // Evidencia
+        if(datos.fotografia) {
+            if(cursorY + 80 > pH - 40) { doc.addPage(); cursorY = 20; }
+            doc.setFont("helvetica", "bold").text("EVIDENCIA FOTOGRÁFICA:", margin, cursorY - 5);
+            try {
+                const dim = await getImageDimensions(datos.fotografia);
+                const ratio = Math.min((pW - 30) / dim.w, 80 / dim.h);
+                doc.addImage(datos.fotografia, 'JPEG', margin, cursorY, dim.w * ratio, dim.h * ratio);
+                cursorY += (dim.h * ratio) + 15;
+            } catch(e) { doc.addImage(datos.fotografia, 'JPEG', margin, cursorY, pW - 30, 80); cursorY += 95; }
         }
 
         // Firma
-        const fY = 260;
-        if(FIRMA_COORDINADOR_BASE64) doc.addImage(FIRMA_COORDINADOR_BASE64, 'PNG', (pageWidth/2)-20, fY-15, 40, 12);
-        doc.line((pageWidth/2)-40, fY, (pageWidth/2)+40, fY);
-        doc.setFontSize(8);
-        doc.text("COORDINADOR DE MANTENIMIENTO INDUSTRIAL", pageWidth/2, fY+5, {align:'center'});
+        if(cursorY + 30 > pH) { doc.addPage(); cursorY = 230; }
+        const fY = Math.max(cursorY + 10, pH - 25);
+        if(FIRMA_COORDINADOR_BASE64) doc.addImage(FIRMA_COORDINADOR_BASE64, 'PNG', (pW/2)-20, fY-15, 40, 12);
+        doc.line((pW/2)-40, fY, (pW/2)+40, fY);
+        doc.setFontSize(9).text("COORDINADOR DE MANTENIMIENTO INDUSTRIAL", pW/2, fY+5, {align:'center'});
 
-        doc.save(`REPORTE_ISYSA_${datos.fecha}.pdf`);
+        doc.save(`REPORTE_CONDICION_${datos.fecha}.pdf`);
     }
 </script>
 </body>
