@@ -169,13 +169,6 @@
         
         .hidden { display: none; }
         .mt-2 { margin-top: 10px; }
-
-        .file-label {
-            font-size: 0.8rem;
-            color: var(--azul-claro);
-            margin-top: 5px;
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -345,7 +338,6 @@
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Ing. Jenniffer Basulto Espadas"> Ing. Jenniffer Basulto Espadas</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="QI. Sergio Alberto Maldonado Perez"> QI. Sergio Alberto Maldonado Perez</label>
                     <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Biol. Carlos Eduardo Olivera Calderon"> Biol. Carlos Eduardo Olivera Calderon</label>
-                    <label class="checkbox-item"><input type="checkbox" class="resp-check" value="Comisión de Seguridad e Higiene"> Comisión de Seguridad e Higiene</label>
                 </div>
             </div>
         </div>
@@ -357,8 +349,8 @@
 <script>
     // --- CONFIGURACIÓN ---
     const scriptURL = "https://script.google.com/macros/s/AKfycbyFLiX7xzDLkb7vaoMigSJouXpBFhGB-7UNRYT60N-GqODJf6-hQFIlHW305UgWFv3L/exec";
-    const LOGO_BASE64 = ""; // PEGAR AQUÍ BASE64 DEL LOGO
-    const FIRMA_COORDINADOR_BASE64 = ""; // PEGAR AQUÍ BASE64 DE LA FIRMA
+    const LOGO_BASE64 = ""; 
+    const FIRMA_COORDINADOR_BASE64 = ""; 
 
     const emailsResponsables = {
         "Biol. Leonel De Jesus Perera Ak": "campo.cosecha@isysa.com.mx",
@@ -385,7 +377,6 @@
         cargarListas();
     };
 
-    // --- FUNCIONES DE APOYO ---
     function actualizarNumeroSemana() {
         const f = document.getElementById('fechaActual').value;
         if (!f) return;
@@ -407,7 +398,6 @@
         } catch (e) { console.log("Listas no cargadas"); }
     }
 
-    // --- COMPRESIÓN DE IMAGEN ---
     async function comprimirImagen(base64, maxWidth = 800) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -432,25 +422,16 @@
         });
     }
 
-    // --- INTERFAZ DINÁMICA ---
     function toggleSections() {
         const t = document.getElementById('tipoObservacion').value;
         if (t === 'altoRiesgo') { window.location.href = "https://observacionesseg.github.io/Trabajos-de-alto-riego/"; return; }
-        
         const sa = document.getElementById('seccionActo');
         const sc = document.getElementById('seccionCondicion');
         sa.classList.toggle('hidden', t !== 'acto');
         sc.classList.toggle('hidden', t !== 'condicion');
-
-        // Reset y Requireds dinámicos
-        const inputs = document.querySelectorAll('.section input, .section select, .section textarea');
-        inputs.forEach(i => {
+        document.querySelectorAll('.section input, .section select, .section textarea').forEach(i => {
             const isVisible = !i.closest('.hidden');
-            if(i.type !== 'checkbox') {
-                if(i.id === 'inputObservado' || i.id === 'fotoTrabajador' || i.id === 'equipoAfectado' || i.id === 'condicionDesc' || i.id === 'fotoFile') {
-                    i.required = isVisible;
-                }
-            }
+            if(i.id === 'inputObservado' || i.id === 'fotoTrabajador' || i.id === 'equipoAfectado' || i.id === 'condicionDesc' || i.id === 'fotoFile') i.required = isVisible;
         });
     }
 
@@ -460,23 +441,12 @@
         o.classList.toggle('hidden', s.value !== 'Otro');
         o.required = (s.value === 'Otro');
     }
-
-    function toggleOtroRazon() {
-        const s = document.getElementById('razonInseguraSelect');
-        const o = document.getElementById('otroRazonInsegura');
-        o.classList.toggle('hidden', s.value !== 'Otro');
-    }
-
-    function toggleOtroFaltante() {
-        const c = document.getElementById('checkOtroFaltante');
-        const o = document.getElementById('otroFaltante');
-        o.classList.toggle('hidden', !c.checked);
-    }
-
+    function toggleOtroRazon() { document.getElementById('otroRazonInsegura').classList.toggle('hidden', document.getElementById('razonInseguraSelect').value !== 'Otro'); }
+    function toggleOtroFaltante() { document.getElementById('otroFaltante').classList.toggle('hidden', !document.getElementById('checkOtroFaltante').checked); }
     function toggleProvisto() { document.getElementById('queFalta').classList.toggle('hidden', document.getElementById('provistoSelect').value === 'SI'); }
     function toggleEvita() { document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI'); }
 
-    // --- ENVÍO Y PROCESAMIENTO ---
+    // --- LOGICA DE ENVÍO REESTRUCTURADA (DATA -> PDF) ---
     document.getElementById('seguridadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const tipo = document.getElementById('tipoObservacion').value;
@@ -484,11 +454,9 @@
         const fotoInput = (tipo === 'acto') ? document.getElementById('fotoTrabajador') : document.getElementById('fotoFile');
 
         if(fotoInput.files.length === 0) { alert("⚠️ Sube la fotografía obligatoria."); return; }
-        if(tipo === 'condicion' && document.querySelectorAll('.resp-check:checked').length === 0) {
-            alert("⚠️ Selecciona al menos un responsable."); return;
-        }
+        if(tipo === 'condicion' && document.querySelectorAll('.resp-check:checked').length === 0) { alert("⚠️ Selecciona un responsable."); return; }
 
-        btn.innerText = "COMPRIMIENDO IMAGEN...";
+        btn.innerText = "PROCESANDO... NO CIERRE";
         btn.disabled = true;
 
         const payload = Object.fromEntries(new FormData(this));
@@ -497,40 +465,41 @@
         if(payload.sitio === 'Otro') payload.sitio = document.getElementById('otroSitio').value;
         if(payload.razonInsegura === 'Otro') payload.razonInsegura = payload.otroRazonInsegura;
 
-        // Checkboxes faltantes
         payload.falta = Array.from(document.querySelectorAll('input[name="falta"]:checked')).map(cb => 
             cb.value === 'Otro' ? "Otro: " + document.getElementById('otroFaltante').value : cb.value
         ).join(", ");
 
-        // Responsables y Emails
         const resps = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value.trim());
         payload.responsables = resps.join(", ");
         payload.emailsResponsables = resps.map(n => emailsResponsables[n] || "").filter(em => em).join(",");
 
         const reader = new FileReader();
         reader.onload = async (ev) => {
+            btn.innerText = "OPTIMIZANDO FOTO...";
             payload.fotografia = await comprimirImagen(ev.target.result);
             
-            if(tipo === 'condicion') {
-                btn.innerText = "GENERANDO PDF...";
-                await generarPDF(payload);
-            }
-
-            btn.innerText = "ENVIANDO DATOS...";
+            btn.innerText = "GUARDANDO EN BASE DE DATOS...";
             try {
+                // PRIMERO ENVIAR DATOS (CRÍTICO PARA IPHONE)
                 await fetch(scriptURL, { method: "POST", body: new URLSearchParams(payload), mode: 'no-cors' });
-                alert("✅ Reporte guardado con éxito.");
+
+                // LUEGO PDF (SOLO SI ES CONDICIÓN)
+                if(tipo === 'condicion') {
+                    btn.innerText = "GENERANDO PDF...";
+                    await generarPDF(payload);
+                }
+
+                alert("✅ ¡Reporte guardado con éxito!");
                 location.reload();
             } catch (err) {
-                alert("❌ Error al enviar.");
+                alert("❌ Error de conexión.");
                 btn.disabled = false;
-                btn.innerText = "Guardar Reporte";
+                btn.innerText = "Reintentar Guardar";
             }
         };
         reader.readAsDataURL(fotoInput.files[0]);
     });
 
-    // --- GENERACIÓN DE PDF ---
     async function generarPDF(datos) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
@@ -538,15 +507,12 @@
         const pH = doc.internal.pageSize.getHeight();
         const margin = 15;
 
-        // Header
         if(LOGO_BASE64) doc.addImage(LOGO_BASE64, 'PNG', margin, 12, 25, 15);
         doc.setFont("helvetica", "bold").setFontSize(14).setTextColor(0, 35, 68);
         doc.text("INDUSTRIA SALINERA DE YUCATÁN S.A. DE C.V.", 45, 18);
-        doc.setFontSize(11).setTextColor(100);
-        doc.text("SEGURIDAD Y SALUD OCUPACIONAL", 45, 23);
+        doc.setFontSize(11).setTextColor(100).text("SEGURIDAD Y SALUD OCUPACIONAL", 45, 23);
         doc.setDrawColor(0, 35, 68).line(margin, 30, pW - margin, 30);
 
-        // Tabla
         doc.autoTable({
             startY: 35,
             head: [[{ content: 'REPORTE: CONDICIÓN INSEGURA', colSpan: 2, styles: { halign: 'center' } }]],
@@ -567,12 +533,10 @@
 
         let cursorY = doc.lastAutoTable.finalY + 10;
         doc.setFont("helvetica", "bold").text("DESCRIPCIÓN DEL HALLAZGO:", margin, cursorY);
-        doc.setFont("helvetica", "normal");
         const splitText = doc.splitTextToSize(datos.descripcionCondicion, pW - 30);
-        doc.text(splitText, margin, cursorY + 7);
+        doc.setFont("helvetica", "normal").text(splitText, margin, cursorY + 7);
         cursorY += (splitText.length * 5) + 12;
 
-        // Evidencia
         if(datos.fotografia) {
             if(cursorY + 80 > pH - 40) { doc.addPage(); cursorY = 20; }
             doc.setFont("helvetica", "bold").text("EVIDENCIA FOTOGRÁFICA:", margin, cursorY - 5);
@@ -584,7 +548,6 @@
             } catch(e) { doc.addImage(datos.fotografia, 'JPEG', margin, cursorY, pW - 30, 80); cursorY += 95; }
         }
 
-        // Firma
         if(cursorY + 30 > pH) { doc.addPage(); cursorY = 230; }
         const fY = Math.max(cursorY + 10, pH - 25);
         if(FIRMA_COORDINADOR_BASE64) doc.addImage(FIRMA_COORDINADOR_BASE64, 'PNG', (pW/2)-20, fY-15, 40, 12);
