@@ -359,7 +359,6 @@
         <button type="submit" id="btnEnviar">Guardar Reporte</button>
     </form>
 </div>
-
 <script>
     // --- CONFIGURACIÓN ---
     const scriptURL = "https://script.google.com/macros/s/AKfycbyFLiX7xzDLkb7vaoMigSJouXpBFhGB-7UNRYT60N-GqODJf6-hQFIlHW305UgWFv3L/exec";
@@ -389,8 +388,10 @@
         const offset = hoy.getTimezoneOffset() * 60000;
         const localISODate = (new Date(hoy - offset)).toISOString().split('T')[0];
         document.getElementById('fechaActual').value = localISODate;
-        if(typeof LOGO_BASE64 !== 'undefined' && LOGO_BASE64) {
-            document.getElementById('logoForm').src = LOGO_BASE64;
+        
+        const logoImg = document.getElementById('logoForm');
+        if(logoImg && typeof LOGO_BASE64 !== 'undefined' && LOGO_BASE64) {
+            logoImg.src = LOGO_BASE64;
         }
         
         actualizarNumeroSemana(); 
@@ -416,8 +417,12 @@
             const data = await response.json();
             const dlObservador = document.getElementById('listaObservadores');
             const dlObservado = document.getElementById('listaObservados');
-            if(data.observadores) data.observadores.forEach(n => { let o = document.createElement('option'); o.value = n; dlObservador.appendChild(o); });
-            if(data.observados) data.observados.forEach(n => { let o = document.createElement('option'); o.value = n; dlObservado.appendChild(o); });
+            if(data.observadores) data.observadores.forEach(n => { 
+                let o = document.createElement('option'); o.value = n; dlObservador.appendChild(o); 
+            });
+            if(data.observados) data.observados.forEach(n => { 
+                let o = document.createElement('option'); o.value = n; dlObservado.appendChild(o); 
+            });
         } catch (e) { console.log("Listas no cargadas"); }
     }
 
@@ -432,38 +437,28 @@
         document.getElementById('seccionCondicion').classList.toggle('hidden', tipo !== 'condicion');
     }
 
-    function toggleOtroLugar() {
-        const s = document.getElementById('sitioSelect');
+    // Funciones simples de UI (Toggles)
+    function toggleOtroLugar() { 
+        const s = document.getElementById('sitioSelect'); 
         const i = document.getElementById('otroSitio');
-        i.classList.toggle('hidden', s.value !== 'Otro');
-        i.required = (s.value === 'Otro');
+        i.classList.toggle('hidden', s.value !== 'Otro'); i.required = (s.value === 'Otro');
     }
-
-    function toggleOtroRazon() {
-        const s = document.getElementById('razonInseguraSelect');
+    function toggleOtroRazon() { 
+        const s = document.getElementById('razonInseguraSelect'); 
         const i = document.getElementById('otroRazonInsegura');
-        i.classList.toggle('hidden', s.value !== 'Otro');
-        i.required = (s.value === 'Otro');
+        i.classList.toggle('hidden', s.value !== 'Otro'); i.required = (s.value === 'Otro');
     }
-
-    function toggleOtroFaltante() {
-        const c = document.getElementById('checkOtroFaltante');
+    function toggleOtroFaltante() { 
+        const c = document.getElementById('checkOtroFaltante'); 
         const i = document.getElementById('otroFaltante');
-        i.classList.toggle('hidden', !c.checked);
-        i.required = c.checked;
+        i.classList.toggle('hidden', !c.checked); i.required = c.checked;
     }
+    function toggleProvisto() { document.getElementById('queFalta').classList.toggle('hidden', document.getElementById('provistoSelect').value === 'SI'); }
+    function toggleEvita() { document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI'); }
 
-    function toggleProvisto() {
-        document.getElementById('queFalta').classList.toggle('hidden', document.getElementById('provistoSelect').value === 'SI');
-    }
-
-    function toggleEvita() {
-        document.getElementById('queEvita').classList.toggle('hidden', document.getElementById('actividadSegura').value === 'SI');
-    }
-
-    // --- FUNCIÓN DE COMPRESIÓN ---
-    function comprimirImagen(file) {
-        return new Promise((resolve) => {
+    // --- EL MOTOR DE VELOCIDAD: COMPRESIÓN AGRESIVA ---
+    function optimizarImagen(file) {
+        return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -471,22 +466,30 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000; 
+                    // Reducimos a 800px para máxima velocidad de subida (sigue viéndose excelente en PDF)
+                    const MAX_DIM = 800; 
                     let width = img.width;
                     let height = img.height;
 
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
+                    if (width > height) {
+                        if (width > MAX_DIM) { height *= MAX_DIM / width; width = MAX_DIM; }
+                    } else {
+                        if (height > MAX_DIM) { width *= MAX_DIM / height; height = MAX_DIM; }
                     }
+                    
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
+                    // Calidad 0.6: El punto exacto entre peso pluma y buena visibilidad
                     ctx.drawImage(img, 0, 0, width, height);
-                    // Comprimimos al 70% de calidad para balance peso/nitidez
-                    resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                    const result = canvas.toDataURL('image/jpeg', 0.6);
+                    
+                    // Limpieza de memoria para dispositivos móviles
+                    img.src = ""; 
+                    resolve(result);
                 };
             };
+            reader.onerror = reject;
         });
     }
 
@@ -496,44 +499,46 @@
         const btn = document.getElementById('btnEnviar');
         const tipo = document.getElementById('tipoObservacion').value;
         
-        // Validaciones básicas
         let fotoInput = (tipo === 'acto') ? document.getElementById('fotoTrabajador') : document.getElementById('fotoFile');
-        if (fotoInput.files.length === 0) { alert("⚠️ Debe subir una foto de evidencia."); return; }
+        if (fotoInput.files.length === 0) { alert("⚠️ Sube una foto."); return; }
         if (tipo === 'condicion' && document.querySelectorAll('.resp-check:checked').length === 0) {
-            alert("⚠️ Seleccione al menos un responsable."); return;
+            alert("⚠️ Selecciona un responsable."); return;
         }
 
-        btn.innerText = "OPTIMIZANDO IMAGEN...";
+        // Cambio de estado inmediato
+        btn.innerText = "⚡ OPTIMIZANDO...";
         btn.disabled = true;
 
-        const formData = new FormData(this);
-        const payload = {};
-        formData.forEach((v, k) => { payload[k] = v; });
-
-        // Ajustes de campos específicos
-        if (payload.semana) payload.semana = payload.semana.replace("Semana ", "");
-        if (payload.sitio === 'Otro') payload.sitio = payload.otroSitio;
-        if (payload.razonInsegura === 'Otro') payload.razonInsegura = payload.otroRazonInsegura;
-
-        const faltantesArr = Array.from(document.querySelectorAll('input[name="falta"]:checked')).map(cb => {
-            return cb.value === 'Otro' ? "Otro: " + document.getElementById('otroFaltante').value : cb.value;
-        });
-        payload.falta = faltantesArr.join(", ");
-
-        const seleccionados = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value.trim());
-        payload.responsables = seleccionados.join(", ");
-        payload.emailsResponsables = seleccionados.map(n => emailsResponsables[n] || "").filter(e => e !== "").join(",");
-        payload.horaReporte = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
         try {
-            // COMPRIMIR ANTES DE ENVIAR
-            const fotoComprimida = await comprimirImagen(fotoInput.files[0]);
-            payload.fotografia = fotoComprimida;
+            // Paso 1: Comprimir (lo que más tarda en red se soluciona aquí en ms)
+            const fotoData = await optimizarImagen(fotoInput.files[0]);
+
+            const formData = new FormData(this);
+            const payload = {};
+            formData.forEach((v, k) => { payload[k] = v; });
+
+            // Formateo de Payload
+            if (payload.semana) payload.semana = payload.semana.replace("Semana ", "");
+            payload.sitio = (payload.sitio === 'Otro') ? payload.otroSitio : payload.sitio;
+            payload.razonInsegura = (payload.razonInsegura === 'Otro') ? payload.otroRazonInsegura : payload.razonInsegura;
             
-            btn.innerText = "ENVIANDO DATOS...";
+            const faltantesArr = Array.from(document.querySelectorAll('input[name="falta"]:checked')).map(cb => {
+                return cb.value === 'Otro' ? "Otro: " + document.getElementById('otroFaltante').value : cb.value;
+            });
+            payload.falta = faltantesArr.join(", ");
+
+            const seleccionados = Array.from(document.querySelectorAll('.resp-check:checked')).map(cb => cb.value.trim());
+            payload.responsables = seleccionados.join(", ");
+            payload.emailsResponsables = seleccionados.map(n => emailsResponsables[n] || "").filter(e => e !== "").join(",");
+            payload.horaReporte = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            payload.fotografia = fotoData;
+
+            // Paso 2: Envío (ahora es ultra ligero)
+            btn.innerText = "🚀 ENVIANDO...";
             await enviar(payload, btn);
+
         } catch (err) {
-            alert("❌ Error al procesar la imagen.");
+            alert("❌ Error de procesamiento.");
             btn.disabled = false;
             btn.innerText = "Guardar Reporte";
         }
@@ -544,38 +549,37 @@
         for (const k in payload) params.append(k, payload[k]);
 
         try {
-            // 1. Guardar en Google Sheets
+            // Guardar datos
             await fetch(scriptURL, { method: "POST", body: params, mode: 'no-cors' });
 
-            // 2. Generar PDF si es condición
+            // Generar PDF (proceso local, no consume internet)
             if (payload.tipoObservacion === 'condicion') {
-                btn.innerText = "GENERANDO PDF...";
+                btn.innerText = "📄 CREANDO PDF...";
                 await generarPDF(payload);
             }
 
-            alert("✅ ¡Reporte guardado exitosamente!");
+            alert("✅ ¡Enviado!");
             location.reload();
         } catch (error) {
-            alert("❌ Error al procesar.");
+            alert("❌ Falló la conexión.");
             btn.disabled = false;
             btn.innerText = "Guardar Reporte";
         }
     }
 
-    // --- PDF ---
+    // --- PDF (OPTIMIZADO PARA PESO) ---
     async function generarPDF(datos) {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
+        const doc = new jsPDF('p', 'mm', 'a4', true); // 'true' activa compresión interna del PDF
         const marginLeft = 15;
-        const contentWidth = doc.internal.pageSize.getWidth() - 30;
 
         if(typeof LOGO_BASE64 !== 'undefined' && LOGO_BASE64) {
-            doc.addImage(LOGO_BASE64, 'PNG', marginLeft, 12, 25, 15);
+            doc.addImage(LOGO_BASE64, 'PNG', marginLeft, 12, 25, 15, undefined, 'FAST');
         }
         
-        doc.setFontSize(14); doc.setTextColor(0, 35, 68);
+        doc.setFontSize(14).setTextColor(0, 35, 68);
         doc.text("INDUSTRIA SALINERA DE YUCATÁN S.A. DE C.V.", 45, 18);
-        doc.setFontSize(10); doc.text("REPORTE DE CONDICIÓN INSEGURA", 45, 23);
+        doc.setFontSize(10).text("REPORTE DE CONDICIÓN INSEGURA", 45, 23);
         doc.line(marginLeft, 30, 195, 30);
 
         doc.autoTable({
@@ -585,22 +589,21 @@
                 ['EQUIPO:', datos.equipoAfectado], ['PRIORIDAD:', datos.prioridad],
                 ['REPORTÓ:', datos.observador], ['RESPONSABLES:', datos.responsables]
             ],
-            theme: 'grid', styles: { fontSize: 9 }
+            theme: 'grid', styles: { fontSize: 8, cellPadding: 2 }
         });
 
         let y = doc.lastAutoTable.finalY + 10;
         doc.text("DESCRIPCIÓN:", marginLeft, y);
-        const desc = doc.splitTextToSize(datos.descripcionCondicion || "", contentWidth);
-        doc.setFont("helvetica", "normal");
-        doc.text(desc, marginLeft, y + 5);
+        const desc = doc.splitTextToSize(datos.descripcionCondicion || "", 180);
+        doc.setFont("helvetica", "normal").text(desc, marginLeft, y + 5);
 
         if (datos.fotografia) {
-            // La foto ya viene comprimida del payload
-            doc.addImage(datos.fotografia, 'JPEG', marginLeft, y + 15, 80, 60);
+            // Usamos 'FAST' para que el guardado del PDF no consuma CPU
+            doc.addImage(datos.fotografia, 'JPEG', marginLeft, y + 15, 80, 60, undefined, 'FAST');
         }
 
         if(typeof FIRMA_COORDINADOR_BASE64 !== 'undefined' && FIRMA_COORDINADOR_BASE64) {
-            doc.addImage(FIRMA_COORDINADOR_BASE64, 'PNG', 85, 250, 40, 12);
+            doc.addImage(FIRMA_COORDINADOR_BASE64, 'PNG', 85, 250, 40, 12, undefined, 'FAST');
         }
         doc.line(65, 262, 145, 262);
         doc.text("FIRMA DE RECIBIDO", 105, 267, {align: 'center'});
