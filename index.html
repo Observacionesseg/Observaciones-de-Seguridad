@@ -292,9 +292,11 @@
             <div id="queFalta" class="form-group hidden">
                 <label>Especifique faltante:</label>
                 <div class="checkbox-grid">
-                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Capacitación"> Capacitación</label>
-                    <label class="checkbox-item"><input type="checkbox" name="falta" value="Herramientas"> Herramientas</label>
-                    <label class="checkbox-item"><input type="checkbox" name="falta" value="EPP"> EPP</label>
+                    <option value="Herramientas, equipos o maquinaria inadecuados, no disponibles o en malas condiciones">Herramientas, equipos o maquinaria inadecuados, no disponibles o en malas condiciones</option>
+                    <option value="Diseño inadecuado de las instalaciones.">Diseño inadecuado de las instalaciones.</option>
+                    <option value="Diseño inadecuado del proceso">Diseño inadecuado del proceso</option>
+                    <option value="Equipo de protección personal no disponible o nunca solicitado">Equipo de protección personal no disponible o nunca solicitado</option>
+                    <option value="Nunca ha recibido capacitación al respecto">Nunca ha recibido capacitación al respecto</option>
                     <label class="checkbox-item"><input type="checkbox" name="falta" value="Otro" id="checkOtroFaltante" onchange="toggleOtroFaltante()"> Otro</label>
                 </div>
                 <input type="text" name="otroFaltante" id="otroFaltante" class="hidden mt-2" placeholder="Especifique qué falta">
